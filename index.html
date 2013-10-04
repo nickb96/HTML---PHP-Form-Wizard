@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="UTF-8" />
+	<title>HTML & PHP - Visual & mechanical form generator</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<style type="text/css">
+		*{margin:0;		padding:0;}
+		.wrapper{width:1060px;margin:0 auto;}
+		.wrapper.noflow{overflow:hidden;}
+		body{
+			margin-top:40px;
+			margin-bottom:40px;
+			font-family:Arial,Verdana,serif;
+			font-size:12px;
+			color:#000;
+		}
+		.seperator{display:block;margin-top:20px;margin-bottom:20px;clear:both;border:1px solid #000;}
+		input[type="button"]{
+			padding:8px;
+			margin-right:10px;
+		}
+		.big-wrapper.error{
+			border:1px solid red;
+			background:#FFBEBE;
+		}
+		.big-wrapper{
+			margin-top:10px;
+			border:1px solid grey;
+			padding:10px;
+			background:whiteSmoke;
+			margin-bottom:10px;
+		}
+		.big-wrapper input{
+			padding:11px;
+			margin-right:3px;
+			vertical-align:middle;
+			font-size:12px;
+		}
+		.big-wrapper textarea{
+			padding:7px;
+			font-family:Arial;
+			font-size:9px;
+			background:black;
+			color:lime;
+		}
+		a{
+			color:blue;
+		}
+		button{
+			padding:7px;
+			border:0px;
+			background: #B90000;
+			color: white;
+			margin-left: 7px;
+			font-size: 10px;
+			text-transform: uppercase;
+			cursor:pointer;
+		}
+	</style>
+	<script type="text/javascript">
+		var inputI = 0;
+		var radioI = 0;
+		var checkI = 0;
+		function removeInput(remId){
+			//Removes input row
+			jQuery('#wrapper-'+remId).slideUp('fast', function() {
+				jQuery(this).remove();
+			});
+			return false;
+		}
+		function GenerateOutput(type){
+			//Generates HTML or PHP output
+			if(type == "html"){
+				jQuery('#html-final-output').val('');
+				jQuery('.htmloutput').each(function(){
+					var htmlfinalout = jQuery('#html-final-output');
+					htmlfinalout.val(htmlfinalout.val() + jQuery(this).val() +"\n")
+				});
+			} else if(type == "php"){
+				jQuery('#php-final-output').val('');
+				jQuery('.phpoutput').each(function(){
+					var phpfinalout = jQuery('#php-final-output');
+					phpfinalout.val(phpfinalout.val() + jQuery(this).val() +"\n")
+				});
+			}
+			return false;
+		}
+		function addTextBox(inputInteger){
+			//Appends textbox
+			var wrapperId = 'wrapper-'+inputInteger;
+			jQuery("#input-area").append("<div class='big-wrapper' id='"+wrapperId+"'></div>");
+			wrapperId = "#" + wrapperId;
+			
+			jQuery(wrapperId).append("<input type='text' class='textbox unique-"+ inputInteger +"' id='label-"+ inputInteger +"' name='label-"+ inputInteger +"' placeholder='label'/>");
+			jQuery(wrapperId).append("<input type='text' class='textbox unique-"+ inputInteger +"' id='name-"+ inputInteger +"' name='name-"+ inputInteger +"' placeholder='form_input_name'/>");
+			jQuery(wrapperId).append("<input type='text' class='textbox unique-"+ inputInteger +"' id='php-"+ inputInteger +"' name='php-"+ inputInteger +"' placeholder='$php_variable_name'/>");
+			jQuery(wrapperId).append("<textarea class='htmloutput' id='readtextbox-"+inputInteger+"'  rows='2' cols='50' id='read-"+ inputInteger +"' name='read-"+ inputInteger +"' placeholder='HTML RENDERED HERE' style='vertical-align:top;' readonly='readonly'></textarea>");
+			jQuery(wrapperId).append("<textarea class='phpoutput' id='php-readtextbox-"+inputInteger+"'  rows='2' cols='50' id='read-"+ inputInteger +"' name='read-"+ inputInteger +"' placeholder='PHP RENDERED HERE' style='vertical-align:top;' readonly='readonly'></textarea>");
+			jQuery(wrapperId).append("<button type='button' onclick='removeInput("+inputInteger+")'>Remove</button>");
+			
+			var tSiblings = jQuery(".textbox").siblings("#readtextbox-"+inputInteger);
+			var tPhpSiblings = jQuery(".textbox").siblings("#php-readtextbox-"+inputInteger);
+			
+			jQuery(".textbox").keyup(function(){
+					tSiblings.val("<input type='text' id='"+jQuery("#name-"+inputInteger).val()+"' name='"+jQuery("#name-"+inputInteger).val()+"' placeholder='"+jQuery("#label-"+inputInteger).val()+"' value='<?php echo $"+jQuery("#php-"+inputInteger).val()+"; ?>'/>");
+			});
+			jQuery(".textbox").keyup(function(){
+					tPhpSiblings.val("$"+jQuery("#php-"+inputInteger).val()+" = (isset($_POST['"+jQuery("#name-"+inputInteger).val()+"'])) ? $_POST['"+jQuery("#name-"+inputInteger).val()+"'] : '';");
+			});
+			
+			//Checks for duplicates(buggy)
+			jQuery('.textbox').change(function() {
+				
+				var jQuerycurrent = jQuery(this);
+
+				jQuery('.textbox').each(function() {
+					if (jQuery(this).val() == jQuerycurrent.val() && jQuery(this).attr('class') != jQuerycurrent.attr('class')) {
+						jQuery(this).parent('.big-wrapper').addClass("error");
+					} else {
+						jQuery(this).parent('.big-wrapper').removeClass("error");
+					}
+
+				});
+			});
+		}
+		jQuery(document).ready(function(){
+			jQuery("#add-textbox").click(function(){
+				addTextBox(inputI++);
+			});
+			jQuery("#add-radiobox").click(function(){
+
+
+			});
+			jQuery("#add-checkbox").click(function(){
+
+
+			});
+		});
+	</script>
+</head>
+<body>
+	<div class="wrapper">
+			<h2>HTML & PHP Form wizard <span style="color:red;">(Under Development)</span></h2>
+		by Nick - <a href="http://www.nickbugeja.com" target="_blank">www.nickbugeja.com</a><br/><br/>
+		<p>Create multiple form inputs, with minimal typing. Instead of writing them manually, this generator allows you to insert basic input options such as label, name and variable which automatically generate an HTML output, and a PHP output to be used for your form.</p>
+		<div class="seperator"></div>
+		<form>
+			<input type="button" value="Add Textbox" id="add-textbox"/>
+			<input type="button" value="Add Radiobox" id="add-radiobox"/>
+			<input type="button" value="Add Checkbox" id="add-checkbox"/>
+		</form>
+		<div class="seperator"></div>
+		<h3>Label | Form input name | $PHP variable name | HTML Rendered | PHP Rendered</h3>
+		<div class="seperator"></div>
+		<div id="input-area">
+			
+		</div>
+		<hr/>
+		<h3>HTML output - <a href="javascript:;" onclick="GenerateOutput('html');">Generate</a></h3>
+		<textarea id="html-final-output" rows="9" cols="110" readonly="readonly"></textarea>
+		<div class="clear"></div>
+		<h3>PHP output - <a href="javascript:;" onclick="GenerateOutput('php');">Generate</a></h3>
+		<textarea id="php-final-output" rows="9" cols="110" readonly="readonly"></textarea>
+	</div>
+</body>
